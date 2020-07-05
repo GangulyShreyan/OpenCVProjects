@@ -10,6 +10,7 @@ def fps():
         _, frame = cap.read()
         frames = frames + 1
         cv2.imshow('frame', frame)
+        end = time.time()
         if int(end-start) == 1 & cv2.waitKey(1) :     
             return(int(frames/(end-start)))
             break

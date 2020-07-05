@@ -45,7 +45,7 @@ while(True):
             cv2.putText(frame, str(directionX), (100, 170), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
             cv2.putText(frame, str(directionY), (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
     
-    cv2.imshow('mask', mask)
+    #cv2.imshow('mask', mask)
     #cv2.drawContours(frame, cnts, -1, (0, 0, 255), 5) 
     
     cv2.imshow('frame', frame)
