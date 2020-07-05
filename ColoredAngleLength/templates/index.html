@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <title>RealTime AngleLength</title>
+    <style>
+      p{
+        margin-left: 5%;
+        text-align: center;
+        font-size: large;
+      }
+      h2{
+        margin-left: 10%;
+        text-align: center;
+        font-size: large;
+      }
+      .container{
+        display: flex;
+        flex-direction: row;
+      }
+      .innercontainer{
+        display: flex;
+        flex-direction: column;
+      } 
+    </style>
+  </head>
+  <body>
+    <u><h1>RealTime AngleLength</h1></u>
+    <div class= "container">
+      <img src="{{ url_for('video_feed') }}">
+      <div class="innercontainer">
+        <div class = "container">
+          <h2>Object 1  </h2>
+          <p>Maximum BGR value : {{ object1.minbgr }}</p>
+          <p>Minimum BGR value : {{ object1.maxbgr }}</p>
+        </div>
+        <div class = "container">
+          <h2>Object 2  </h2>
+          <p>Maximum BGR value : {{ object2.minbgr }}</p>
+          <p>Minimum BGR value : {{ object2.maxbgr }}</p>
+        </div>
+        <div class = "container">
+          <h2>Try Changing these values in <u>app.py</u> for custom objects.</h2>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+</html>
