@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+import imutils
 
 class VideoCamera(object):
     def __init__(self):
@@ -11,62 +12,55 @@ class VideoCamera(object):
         #releasing camera
         self.video.release()
 
-
-    def get_frame(self, object1, object2):
+    def get_roi(self):
         _, frame = self.video.read()
-        framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        roi = frame[100:300, 0:200]
 
-        resImage = np.shape(frame)
-        resScreen = resImage
-        
-        '''
-        For obtaining the RGB pixel value of the object
-        
-        cv2.circle(frame, (100,100), 80, (0, 0, 255))
-        roi = frame[50:200 , 50:200]
+        cv2.imwrite('output.jpg', roi)
 
-        '''
-
-        mask = cv2.inRange(frame, object1.minbgr, object1.maxbgr, None) 
-        mask2 = cv2.inRange(frame, object2.minbgr, object2.maxbgr,  None)
+        ret, jpeg = cv2.imencode('.jpg', roi)
+        return jpeg.tobytes()
 
 
-        points = cv2.findNonZero(mask)
-        points2 = cv2.findNonZero(mask2)
-        
-        if (points is not None) and (points2 is not None):
+    def get_frame(self, colorobj1, colorobj2):
+        _, frame = self.video.read()
+        framecvt = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            lent = np.shape(points)
-            lent2 = np.shape(points2)
+        obj1 = cv2.inRange(framecvt, colorobj1[0], colorobj1[1]) 
+        obj2 = cv2.inRange(framecvt, colorobj2[0], colorobj2[1])
 
-            middlepointcoordinate = points[int(lent[0]/2)]
-            middlepointcoordinate2 = points2[int(lent2[0]/2)]
+        cnts1 = cv2.findContours(obj1.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        cnts1 = imutils.grab_contours(cnts1)
+        cnts1 = sorted(cnts1, key = cv2.contourArea, reverse = True)[:10]
 
-            middlepointcoordinate = (middlepointcoordinate[0][0], middlepointcoordinate[0][1])
-            middlepointcoordinate2 = (middlepointcoordinate2[0][0], middlepointcoordinate2[0][1])
+        cnts2 = cv2.findContours(obj2.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        cnts2 = imutils.grab_contours(cnts2)
+        cnts2 = sorted(cnts2, key = cv2.contourArea, reverse = True)[:10]
 
-            avg = (int((middlepointcoordinate[0] + middlepointcoordinate2[0])/2) , int((middlepointcoordinate[1] + middlepointcoordinate2[1])/2))
+        mask1 =cv2.bitwise_and(frame, frame, mask = obj1)
+        mask2 =cv2.bitwise_and(frame, frame, mask = obj2)
 
-            angle = math.degrees(np.arctan((middlepointcoordinate2[1] - middlepointcoordinate[1])/(middlepointcoordinate2[0] - middlepointcoordinate[0])))
-            distance = math.sqrt((middlepointcoordinate2[0] - middlepointcoordinate[0])**2 + (middlepointcoordinate2[1] - middlepointcoordinate[1])**2)
+        if len(cnts1)!= 0 and len(cnts2)!= 0:
+                M1 = cv2.moments(cnts1[0])
+                M2 = cv2.moments(cnts2[0])
+                if(M1["m00"] != 0) and (M2["m00"] != 0):
+                    cX1 = int(M1["m10"] / M1["m00"])    
+                    cY1 = int(M1["m01"] / M1["m00"])
 
-            cv2.line(frame, middlepointcoordinate, middlepointcoordinate2, (0,255, 0))
-            cv2.putText(frame, "Angle : " + str(angle), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
-            cv2.putText(frame, "Length : " + str(distance), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
+                    cX2 = int(M2["m10"] / M2["m00"])
+                    cY2 = int(M2["m01"] / M2["m00"])
 
-            cv2.circle(frame, middlepointcoordinate, 5, (0,0,255), 10)
-            cv2.circle(frame, middlepointcoordinate2, 5, (0,0,255), 10)
+                    if(cX2 - cX1 != 0):
+                        angle = math.degrees(np.arctan((cY2 - cY1)/(cX2 - cX1)))
+                        distance = math.sqrt((cX2 - cX1)**2 + (cY2 - cY1)**2)
+
+                        cv2.line(frame, (cX1, cY1), (cX2, cY2), (0,255, 0))
+                        cv2.putText(frame, "Angle : " + str(round(angle, 2)), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
+                        cv2.putText(frame, "Length : " + str(round(distance, 2)), (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1)
+
+                        cv2.circle(frame, (cX1, cY1), 5, (0,0,255), 10)
+                        cv2.circle(frame, (cX2, cY2), 5, (0,0,255), 10)
             
-        '''
-        cv2.imshow('frame', frame)
-        cv2.imshow('frame1', mask)
-        cv2.imshow('frame2', mask2)
-
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cv2.imwrite("saved.jpg", roi)
-            break
-        '''
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()

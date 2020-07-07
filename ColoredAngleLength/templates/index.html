@@ -25,23 +25,44 @@
   <body>
     <u><h1>RealTime AngleLength</h1></u>
     <div class= "container">
-      <img src="{{ url_for('video_feed') }}">
+      {% if outshow == True %}
+            <img src="{{ url_for('video_feed') }}">
+          {% endif %}
+      
       <div class="innercontainer">
         <div class = "container">
           <h2>Object 1  </h2>
-          <p>Maximum BGR value : {{ object1.minbgr }}</p>
-          <p>Minimum BGR value : {{ object1.maxbgr }}</p>
+          {% if inpobj1 == True %}
+            <img src="{{ url_for('color_detect') }}">
+          {% endif %}
+          <p>Maximum BGR value : </p>
+          <p>Minimum BGR value : </p>
         </div>
         <div class = "container">
+          {% if inpobj2 == True %}
+            <img src="{{ url_for('color_detect') }}">
+          {% endif %}
           <h2>Object 2  </h2>
-          <p>Maximum BGR value : {{ object2.minbgr }}</p>
-          <p>Minimum BGR value : {{ object2.maxbgr }}</p>
+          <p>Maximum BGR value : </p>
+          <p>Minimum BGR value : </p>
         </div>
         <div class = "container">
           <h2>Try Changing these values in <u>app.py</u> for custom objects.</h2>
         </div>
       </div>
+
+      <button onclick = "clicked();" style = "color:yellowgreen;height: 100px; width: 100px;">go t object2</button>
+      <button onclick = "showoutput();" style = "color:yellowgreen;height: 100px; width: 100px;">showoutput</button>
     </div>
-    
+
+    <script>
+      function clicked(){
+        window.location.href = "click";
+      }
+
+      function showoutput(){
+        window.location.href = "showoutput";
+      }
+    </script>
   </body>
 </html>
