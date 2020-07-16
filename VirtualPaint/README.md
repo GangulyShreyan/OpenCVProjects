@@ -1,9 +1,10 @@
-# ColoredObjectAngleLength
-
-![alt text](https://github.com/GangulyShreyan/ColoredObjectAngleLength/blob/master/Capture.JPG)
+# VirtualPaint
 
 1. git clone this repository
 
-2. Change Threshold values in app.py
+2. Run app.py adn you're good to go
 
-3. Run app.py
+## Dependencies:
+1. Flask
+2. Opencv
+3. Numpy
